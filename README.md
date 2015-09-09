@@ -1,0 +1,1 @@
+Text command handler for Go.
