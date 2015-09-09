@@ -41,7 +41,7 @@ For example:
 ```go
 import "github.com/funny/cmd"
 
-cmd.Register("cmd (abc|def) ([0-9]) ([0-9)", "test", func(args []string){
+cmd.Register("cmd (abc|def) ([0-9]) ([0-9])", "test", func(args []string){
 	fmt.Println(args[0]) // cmd abc 1 2
 	fmt.Println(args[1]) // abc
 	fmt.Println(args[2]) // 1
