@@ -54,7 +54,7 @@ func (cmd *CMD) Register(format, desc string, callback interface{}) {
 	})
 }
 
-func (cmd *CMD) Process(command string) (result interface{}, ok bool) {
+func (cmd *CMD) Process(command string) (interface{}, bool) {
 	command = strings.Trim(command, "\n\r\t ")
 	for i := 0; i < len(cmd.handlers); i++ {
 		if matches := cmd.handlers[i].Regexp.FindStringSubmatch(command); len(matches) > 0 {
@@ -64,14 +64,14 @@ func (cmd *CMD) Process(command string) (result interface{}, ok bool) {
 			case func([]string):
 				callback(matches)
 			case func() interface{}:
-				result = callback()
+				return callback(), true
 			case func([]string) interface{}:
-				result = callback(matches)
+				return callback(matches), true
 			}
-			return result, true
+			return nil, true
 		}
 	}
-	return
+	return nil, false
 }
 
 func (cmd *CMD) Help(w io.Writer) error {
