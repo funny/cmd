@@ -8,7 +8,19 @@ import (
 	"strings"
 )
 
-var handlers []handler
+var defaultCmd = New()
+
+func Register(format, desc string, callback interface{}) {
+	defaultCmd.Register(format, desc, callback)
+}
+
+func Process(command string) (interface{}, bool) {
+	return defaultCmd.Process(command)
+}
+
+func Help(w io.Writer) error {
+	return defaultCmd.Help(w)
+}
 
 type handler struct {
 	Format   string
@@ -17,7 +29,15 @@ type handler struct {
 	Regexp   *regexp.Regexp
 }
 
-func Register(format, desc string, callback interface{}) {
+type CMD struct {
+	handlers []handler
+}
+
+func New() *CMD {
+	return &CMD{}
+}
+
+func (cmd *CMD) Register(format, desc string, callback interface{}) {
 	format = strings.Trim(format, "\n\r\t ")
 	regexpStr := format
 	if regexpStr[0] != '^' {
@@ -26,7 +46,7 @@ func Register(format, desc string, callback interface{}) {
 	if regexpStr[len(regexpStr)-1] != '$' {
 		regexpStr = regexpStr + "$"
 	}
-	handlers = append(handlers, handler{
+	cmd.handlers = append(cmd.handlers, handler{
 		format,
 		desc,
 		callback,
@@ -34,11 +54,11 @@ func Register(format, desc string, callback interface{}) {
 	})
 }
 
-func Process(command string) (result interface{}, ok bool) {
+func (cmd *CMD) Process(command string) (result interface{}, ok bool) {
 	command = strings.Trim(command, "\n\r\t ")
-	for i := 0; i < len(handlers); i++ {
-		if matches := handlers[i].Regexp.FindStringSubmatch(command); len(matches) > 0 {
-			switch callback := handlers[i].Callback.(type) {
+	for i := 0; i < len(cmd.handlers); i++ {
+		if matches := cmd.handlers[i].Regexp.FindStringSubmatch(command); len(matches) > 0 {
+			switch callback := cmd.handlers[i].Callback.(type) {
 			case func():
 				callback()
 			case func([]string):
@@ -54,17 +74,17 @@ func Process(command string) (result interface{}, ok bool) {
 	return
 }
 
-func Help(w io.Writer) error {
+func (cmd *CMD) Help(w io.Writer) error {
 	var maxLen int
-	for i := 0; i < len(handlers); i++ {
-		if l := len(handlers[i].Format); l > maxLen {
+	for i := 0; i < len(cmd.handlers); i++ {
+		if l := len(cmd.handlers[i].Format); l > maxLen {
 			maxLen = l
 		}
 	}
 
 	var fmtStr = "%-" + strconv.Itoa(maxLen) + "s\t%s\n"
-	for i := 0; i < len(handlers); i++ {
-		if _, err := fmt.Fprintf(w, fmtStr, handlers[i].Format, handlers[i].Desc); err != nil {
+	for i := 0; i < len(cmd.handlers); i++ {
+		if _, err := fmt.Fprintf(w, fmtStr, cmd.handlers[i].Format, cmd.handlers[i].Desc); err != nil {
 			return err
 		}
 	}
