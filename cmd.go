@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var defaultCmd = New()
+var defaultCmd CMD
 
 func Register(format, desc string, callback interface{}) {
 	defaultCmd.Register(format, desc, callback)
@@ -22,6 +22,10 @@ func Help(w io.Writer) error {
 	return defaultCmd.Help(w)
 }
 
+func Shell(name string) {
+	defaultCmd.Shell(name)
+}
+
 type handler struct {
 	Format   string
 	Desc     string
@@ -31,10 +35,6 @@ type handler struct {
 
 type CMD struct {
 	handlers []handler
-}
-
-func New() *CMD {
-	return &CMD{}
 }
 
 func (cmd *CMD) Register(format, desc string, callback interface{}) {
