@@ -21,14 +21,14 @@ func (cmd *CMD) Shell(name string) {
 	}
 
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGUSR1, syscall.SIGTERM)
+	signal.Notify(sigChan, syscall.SIGUSR1, syscall.SIGTERM, syscall.SIGINT)
 
 	for sig := range sigChan {
 		switch sig {
 		case syscall.SIGUSR1:
 			cmd.shellCommand(name)
-		case syscall.SIGTERM:
-			log.Println("killed")
+		case syscall.SIGTERM, syscall.SIGINT:
+			log.Println(name, "killed")
 			return
 		}
 	}
