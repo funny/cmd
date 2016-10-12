@@ -19,11 +19,11 @@ func (cmd *CMD) initShell(name string) {
 
 	cmd.Register(
 		"cpuprof (start|stop)",
-		"Start or stop cpu profile. The profile will saved to "+name+".cpu.profile.",
+		"Start or stop cpu profile. The profile will saved to "+name+".cpu.prof.",
 		func(args []string) {
 			switch args[1] {
 			case "start":
-				pprof.StartCPUProfile(name + ".cpu.profile")
+				pprof.StartCPUProfile(name + ".cpu.prof")
 			case "stop":
 				pprof.StopCPUProfile()
 			}
@@ -37,18 +37,18 @@ func (cmd *CMD) initShell(name string) {
 			switch args[1] {
 			case "block":
 				debug, _ := strconv.Atoi(args[2])
-				pprof.SaveProfile("block", name+".block.profile", debug)
+				pprof.SaveProfile("block", name+".block.prof", debug)
 			case "gc":
 				log.Printf("lookup gc: %s", pprof.GCSummary())
 			case "goroutine":
 				debug, _ := strconv.Atoi(args[2])
-				pprof.SaveProfile("goroutine", name+".goroutine.profile", debug)
+				pprof.SaveProfile("goroutine", name+".goroutine.prof", debug)
 			case "heap":
 				debug, _ := strconv.Atoi(args[2])
-				pprof.SaveProfile("heap", name+".heap.profile", debug)
+				pprof.SaveProfile("heap", name+".heap.prof", debug)
 			case "threadcreate":
 				debug, _ := strconv.Atoi(args[2])
-				pprof.SaveProfile("threadcreate", name+".threadcreate.profile", debug)
+				pprof.SaveProfile("threadcreate", name+".threadcreate.prof", debug)
 			}
 		},
 	)
